@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Movie implements Serializable {
     private String name;
-    private Tags[] tags;
+    private String[] tags;
 
     public String getName() {
         return name;
@@ -14,11 +14,11 @@ public class Movie implements Serializable {
         this.name = name;
     }
 
-    public Tags[] getTags() {
+    public String[] getTags() {
         return tags;
     }
 
-    public void setTags(Tags[] tags) {
+    public void setTags(String[] tags) {
         this.tags = tags;
     }
 
