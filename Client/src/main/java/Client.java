@@ -8,6 +8,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Client {
@@ -63,6 +64,8 @@ public class Client {
             }
             else if(option == 3){
 //                tag = reader.readLine();
+                showAllTags();
+                System.out.println();
                 selectMovieByTag(user.getUserName());
             }
             else if(option == 4){
@@ -76,17 +79,26 @@ public class Client {
     }
 
     public static void topTenMovies() throws FileNotFoundException, RemoteException {
-        List<String> list = movieCatalog.topTenMovies();
+        Map<String, Double> map = movieCatalog.topTenMovies();
         int i = 0;
-        for (String s : list) {
+        for(Map.Entry<String, Double> entry : map.entrySet()){
             if(i < 10){
-                System.out.println(s);
+                System.out.println(entry.getKey() + "  rating " + entry.getValue());
                 i++;
             }
             else{
                 break;
             }
         }
+//        for (String s : list) {
+//            if(i < 10){
+//                System.out.println(s);
+//                i++;
+//            }
+//            else{
+//                break;
+//            }
+//        }
     }
 
     public static void recommendation(String userName) throws IOException{
@@ -112,17 +124,21 @@ public class Client {
             }
 
         }
-        List<String> listWithMoviesByTags = movieCatalog.selectMovieByTag(tagListFromUser, userName);
-
-//        for (int i = listWithMoviesByTags.size()-1; i >=0 ; i--) {
-//            System.out.println(listWithMoviesByTags.get(i));
-//        }
-        for (String listWithMoviesByTag : listWithMoviesByTags) {
-            System.out.println(listWithMoviesByTag);
+        Map<String, Double> mapWithMoviesByTag = movieCatalog.selectMovieByTag(tagListFromUser, userName);
+        for(Map.Entry<String, Double> entry : mapWithMoviesByTag.entrySet()){
+            System.out.println(entry.getKey() + "  rating " + entry.getValue());
             for (String s : tagListFromUser) {
-                movieCatalog.addMoviesAndTag(userName, listWithMoviesByTag, s);
+                movieCatalog.addMoviesAndTag(userName, entry.getKey(), s);
             }
         }
+
+
+//        for (String listWithMoviesByTag : mapWithMoviesByTag) {
+//            System.out.println(listWithMoviesByTag);
+//            for (String s : tagListFromUser) {
+//                movieCatalog.addMoviesAndTag(userName, listWithMoviesByTag, s);
+//            }
+//        }
     }
 
     public static void findTheMovie() throws IOException, NotBoundException, RemoteException{
@@ -130,24 +146,29 @@ public class Client {
         String repeat = "";
         String askMark = "";
         int mark = 0;
-        String s = movieCatalog.findTheMovie(reader.readLine());
-        if (!s.isEmpty()){
-            System.out.println(s);
-            System.out.println("Ocinka? Y or N");
-            askMark = reader.readLine();
-            if(askMark.equals("Y")){
-                System.out.println("from 1 to 5 mark");
-                mark = Integer.parseInt(reader.readLine());
-                if(mark >= 1 && mark <= 5){
-                    addMovieMark(user.getUserName(), s, mark);
-                }
-                else{
+        List<String> findTheMovieList = movieCatalog.findTheMovie(reader.readLine());
+        if(findTheMovieList != null && !findTheMovieList.isEmpty()){
+            for (String movie : findTheMovieList) {
+                System.out.println(movie);
+                System.out.println("Ocinka? Y or N");
+                askMark = reader.readLine();
+                if(askMark.equals("Y")){
                     System.out.println("from 1 to 5 mark");
+                    mark = Integer.parseInt(reader.readLine());
+                    if(mark >= 1 && mark <= 5){
+                        addMovieMark(user.getUserName(), movie, mark);
+                    }
+                    else{
+                        System.out.println("from 1 to 5 mark");
+                    }
                 }
+//                else if(askMark.equals("N")){
+//                    System.exit(1);
+//                    System.out.println("ok(");
+//                }
             }
-            else if(askMark.equals("N")){
-                System.exit(1);
-            }
+            System.out.println();
+            System.out.println("It's all movies what we find");
         }
         else{
             System.out.println("Takogo nema. Repeat? Y or N");
@@ -159,6 +180,37 @@ public class Client {
                 System.exit(1);
             }
         }
+
+
+//        String s = movieCatalog.findTheMovie(reader.readLine());
+//        if (!s.isEmpty()){
+//            System.out.println(s);
+//            System.out.println("Ocinka? Y or N");
+//            askMark = reader.readLine();
+//            if(askMark.equals("Y")){
+//                System.out.println("from 1 to 5 mark");
+//                mark = Integer.parseInt(reader.readLine());
+//                if(mark >= 1 && mark <= 5){
+//                    addMovieMark(user.getUserName(), s, mark);
+//                }
+//                else{
+//                    System.out.println("from 1 to 5 mark");
+//                }
+//            }
+//            else if(askMark.equals("N")){
+//                System.exit(1);
+//            }
+//        }
+//        else{
+//            System.out.println("Takogo nema. Repeat? Y or N");
+//            repeat = reader.readLine();
+//            if(repeat.equals("Y")){
+//                findTheMovie();
+//            }
+//            else if(repeat.equals("N")){
+//                System.exit(1);
+//            }
+//        }
     }
 
     public static void addMovieMark(String userName, String movieName, int mark) throws IOException, NotBoundException, RemoteException{

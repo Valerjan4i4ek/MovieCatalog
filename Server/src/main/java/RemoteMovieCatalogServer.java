@@ -21,16 +21,17 @@ public class RemoteMovieCatalogServer implements MovieCatalog{
     }
 
     @Override
-    public String findTheMovie(String keyWord) throws RemoteException, FileNotFoundException {
+    public List<String> findTheMovie(String keyWord) throws RemoteException, FileNotFoundException {
         List<Movie> list = getMovieAndTagName();
+        List<String> listWithFindingMovies = new ArrayList<>();
         if(list != null && !list.isEmpty()){
             for (int i = 0; i < list.size(); i++) {
                 if(list.get(i).getName().contains(keyWord)){
-                    return list.get(i).getName();
+                    listWithFindingMovies.add(list.get(i).getName());
                 }
             }
         }
-        return "";
+        return listWithFindingMovies;
     }
 
     @Override
@@ -76,20 +77,24 @@ public class RemoteMovieCatalogServer implements MovieCatalog{
 
                 String[] array = movieList.get(i).getTags();
                 for (int j = 0; j <= array.length-1; j++) {
-                    if(!tagList.contains(array[j])){
-                        tagList.add(array[j]);
-                    }
+//                    if(!tagList.contains(array[j])){
+//                        tagList.add(array[j]);
+//                    }
+                    tagList.add(array[j]);
                 }
             }
         }
+        Set<String> set = new HashSet<>(tagList);
+        tagList.clear();
+        tagList.addAll(set);
         return tagList;
     }
 
     @Override
-    public List<String> selectMovieByTag(List<String> tagListFromUser, String userName) throws RemoteException, FileNotFoundException {
+    public Map<String, Double> selectMovieByTag(List<String> tagListFromUser, String userName) throws RemoteException, FileNotFoundException {
         List<Movie> movieList = jsonToMovie(JSON_FILE_NAME);
         List<String> tagListFromJson = null;
-        List<String> movieNameFromMovieMarkTable = null;
+        List<String> movieNameFromMovieMarkTable = sql.getMovieNameFromMovieMarkTable(userName);
         List<String> listWithMoviesByTags = new LinkedList<>();
         if(!movieList.isEmpty()){
             for (int i = 0; i < movieList.size(); i++){
@@ -99,8 +104,13 @@ public class RemoteMovieCatalogServer implements MovieCatalog{
                     tagListFromJson.add(array[j]);
                 }
                 if(tagListFromJson.containsAll(tagListFromUser)){
-                    movieNameFromMovieMarkTable = sql.getMovieNameFromMovieMarkTable(userName);
-                    if(!movieNameFromMovieMarkTable.contains(movieList.get(i).getName())){
+//                    movieNameFromMovieMarkTable = sql.getMovieNameFromMovieMarkTable(userName);
+                    if(movieNameFromMovieMarkTable != null && !movieNameFromMovieMarkTable.isEmpty()){
+                        if(!movieNameFromMovieMarkTable.contains(movieList.get(i).getName())){
+                            listWithMoviesByTags.add(movieList.get(i).getName());
+                        }
+                    }
+                    else{
                         listWithMoviesByTags.add(movieList.get(i).getName());
                     }
                 }
@@ -153,8 +163,8 @@ public class RemoteMovieCatalogServer implements MovieCatalog{
     }
 
     @Override
-    public List<String> topTenMovies() throws RemoteException, FileNotFoundException {
-        List<String> topTenLis = new LinkedList<>();
+    public Map<String, Double> topTenMovies() throws RemoteException, FileNotFoundException {
+//        List<String> topTenLis = new LinkedList<>();
         List<Movie> jsonList = jsonToMovie(JSON_FILE_NAME);
         List<String> movieList = new ArrayList<>();
         for (Movie movie : jsonList) {
@@ -173,18 +183,18 @@ public class RemoteMovieCatalogServer implements MovieCatalog{
                 map.put(s, 0.0);
             }
         }
-        if(!map.isEmpty()){
-
-            for(Map.Entry<String, Double> entry : map.entrySet()){
-                System.out.println(entry.getKey() + " " + entry.getValue());
-                topTenLis.add(entry.getKey());
-            }
-        }
-        return topTenLis;
+//        if(!map.isEmpty()){
+//
+//            for(Map.Entry<String, Double> entry : map.entrySet()){
+//                System.out.println(entry.getKey() + " " + entry.getValue());
+//                topTenLis.add(entry.getKey());
+//            }
+//        }
+        return map;
     }
 
 
-    public List<String> getAverageMarkByMovieName(List<String> listWithMoviesByTags){
+    public Map<String, Double> getAverageMarkByMovieName(List<String> listWithMoviesByTags){
         List<String> averageMarkByMovieName = new LinkedList<>();
         Map<String, Double> map = sql.getAverageMarkByMovieName(listWithMoviesByTags).entrySet().stream()
                 .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
@@ -209,15 +219,15 @@ public class RemoteMovieCatalogServer implements MovieCatalog{
 //                        LinkedHashMap::new
 //                ));
 
-        if(!map.isEmpty()){
+//        if(!map.isEmpty()){
+//
+//            for(Map.Entry<String, Double> entry : map.entrySet()){
+//                System.out.println(entry.getKey() + " " + entry.getValue());
+//                averageMarkByMovieName.add(entry.getKey());
+//            }
+//        }
 
-            for(Map.Entry<String, Double> entry : map.entrySet()){
-                System.out.println(entry.getKey() + " " + entry.getValue());
-                averageMarkByMovieName.add(entry.getKey());
-            }
-        }
-
-        return averageMarkByMovieName;
+        return map;
     }
 
     @Override
