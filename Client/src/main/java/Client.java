@@ -103,8 +103,13 @@ public class Client {
 
     public static void recommendation(String userName) throws IOException{
         List<String> list = movieCatalog.recommendation(userName);
-        for (String s : list) {
-            System.out.println(s);
+        if(list != null && !list.isEmpty()){
+            for (String s : list) {
+                System.out.println(s);
+            }
+        }
+        else{
+            topTenMovies();
         }
     }
 

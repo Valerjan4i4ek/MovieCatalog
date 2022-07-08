@@ -39,7 +39,7 @@ public class RemoteMovieCatalogServer implements MovieCatalog{
         List<Integer> list = sql.getMovieMarks(movieName);
         incrementMovieMark();
         if(list != null && !list.isEmpty()){
-            sql.addMovieMark(new MovieMark(countMovieMark, userName, movieName, mark, average((ArrayList<Integer>) list)));
+            sql.addMovieMark(new MovieMark(countMovieMark, userName, movieName, mark, average((ArrayList<Integer>) list, mark)));
         }
         else{
             sql.addMovieMark(new MovieMark(countMovieMark, userName, movieName, mark, mark));
@@ -259,12 +259,12 @@ public class RemoteMovieCatalogServer implements MovieCatalog{
         }
     }
 
-    static double average (ArrayList<Integer> list){
+    static double average (ArrayList<Integer> list, int newMark){
         double sum = 0;
         for (int i = 0; i < list.size(); i++) {
             sum += (double)list.get(i);
         }
-        return sum/list.size();
+        return (sum + newMark)/(list.size()+1);
     }
 
     public void incrementMoviesAndTag(){
