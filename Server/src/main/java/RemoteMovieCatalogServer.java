@@ -149,6 +149,13 @@ public class RemoteMovieCatalogServer implements MovieCatalog{
 //        System.out.println();
 
         List<String> topMoviesFromSimilarUsers = sql.getTopMoviesFromSimilarUsers(usersWithHighMarksToSimilarMovies);
+        List<String> topMoviesFromSimilarUsersFinal = new LinkedList<>();
+        for(String s : topMoviesFromSimilarUsers){
+            if(!movieByUserWithHighMark.contains(s)){
+                topMoviesFromSimilarUsersFinal.add(s);
+            }
+        }
+
 //        for (String topMoviesFromSimilarUser : topMoviesFromSimilarUsers) {
 //            System.out.println(topMoviesFromSimilarUser);
 //        }
@@ -159,7 +166,7 @@ public class RemoteMovieCatalogServer implements MovieCatalog{
 //            System.out.println(moviesFromSimilarUserByLovelyTag);
 //        }
 
-        return sql.getMoviesFromSimilarUserByLovelyTags(lovelyTagsFinal, topMoviesFromSimilarUsers);
+        return sql.getMoviesFromSimilarUserByLovelyTags(lovelyTagsFinal, topMoviesFromSimilarUsersFinal);
     }
 
     @Override
