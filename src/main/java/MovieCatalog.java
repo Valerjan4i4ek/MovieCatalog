@@ -11,7 +11,7 @@ public interface MovieCatalog extends Remote {
     String addMoviesAndTag(String userName, String movieName, String tag) throws RemoteException;
     List<String> showAllTags() throws RemoteException, FileNotFoundException;
     Map<String, Double> selectMovieByTag(List<String> tagListFromUser, String userName) throws RemoteException, FileNotFoundException;
-    List<String> recommendation(String userName) throws RemoteException;
+    Map<String, Double> recommendation(String userName) throws RemoteException;
     Map<String, Double> topTenMovies() throws RemoteException, FileNotFoundException;
 
     List<Movie> getMovieAndTagName() throws RemoteException, FileNotFoundException;

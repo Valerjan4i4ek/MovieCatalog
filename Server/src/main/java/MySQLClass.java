@@ -356,6 +356,7 @@ public class MySQLClass {
 
     public List<String> getMoviesFromSimilarUserByLovelyTags(List<String> lovelyTags, List<String> topMoviesFromSimilarUsers){
         List<String> list = new ArrayList<>();
+        List<String> tagList = new ArrayList<>();
 
         try{
             Connection conn = null;
@@ -372,7 +373,29 @@ public class MySQLClass {
 
                     while (rs.next()){
                         String tag = rs.getString("tag");
-                        if(lovelyTags.contains(tag) && !list.contains(topMoviesFromSimilarUsers.get(i))){
+                        tagList.add(tag);
+//                        if(tag != null && !tag.isEmpty()){
+//                            if(lovelyTags.contains(tag) && !list.contains(topMoviesFromSimilarUsers.get(i))){
+//                                list.add(topMoviesFromSimilarUsers.get(i));
+//                            }
+//                        }
+//                        else{
+//                            if(!list.contains(topMoviesFromSimilarUsers.get(i))){
+//                                list.add(topMoviesFromSimilarUsers.get(i));
+//                            }
+//                        }
+
+                    }
+                    if(!tagList.isEmpty()){
+                        for (String s : tagList) {
+                            if (lovelyTags.contains(s) && !list.contains(topMoviesFromSimilarUsers.get(i))) {
+                                list.add(topMoviesFromSimilarUsers.get(i));
+                            }
+                        }
+
+                    }
+                    else{
+                        if(!list.contains(topMoviesFromSimilarUsers.get(i))){
                             list.add(topMoviesFromSimilarUsers.get(i));
                         }
                     }
@@ -425,9 +448,10 @@ public class MySQLClass {
                     while (rs.next()){
                         String movieName = rs.getString("movieName");
                         int mark = rs.getInt("mark");
-                        if(mark >= 4 && !list.contains(movieName)){
+                        if(mark >= 4 /*&& !list.contains(movieName)*/){
                             list.add(movieName);
                         }
+
                     }
                 } finally {
                     try{

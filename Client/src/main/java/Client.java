@@ -90,27 +90,29 @@ public class Client {
                 break;
             }
         }
-//        for (String s : list) {
-//            if(i < 10){
-//                System.out.println(s);
-//                i++;
-//            }
-//            else{
-//                break;
-//            }
-//        }
     }
 
     public static void recommendation(String userName) throws IOException{
-        List<String> list = movieCatalog.recommendation(userName);
-        if(list != null && !list.isEmpty()){
-            for (String s : list) {
-                System.out.println(s);
+        Map<String, Double> map = movieCatalog.recommendation(userName);
+        if(map != null && !map.isEmpty()){
+            for(Map.Entry<String, Double> entry : map.entrySet()){
+                if(entry.getValue() >= 4.0){
+                    System.out.println(entry.getKey() + "  rating " + entry.getValue());
+                }
             }
         }
         else{
             topTenMovies();
         }
+
+//        if(list != null && !list.isEmpty()){
+//            for (String s : list) {
+//                System.out.println(s);
+//            }
+//        }
+//        else{
+//            topTenMovies();
+//        }
     }
 
     public static void selectMovieByTag(String userName) throws IOException {

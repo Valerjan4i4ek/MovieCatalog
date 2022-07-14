@@ -120,7 +120,7 @@ public class RemoteMovieCatalogServer implements MovieCatalog{
     }
 
     @Override
-    public List<String> recommendation(String userName) throws RemoteException {
+    public Map<String, Double> recommendation(String userName) throws RemoteException {
         List<String> movieByUserWithHighMark = sql.getMovieByUserWithHighMark(userName);
 //        for (String s : movieByUserWithHighMark) {
 //            System.out.println(s);
@@ -137,7 +137,7 @@ public class RemoteMovieCatalogServer implements MovieCatalog{
         List<String> lovelyTagsFinal = new LinkedList<>();
         int i = 0;
         for (String lovelyTag : lovelyTags) {
-            if(i != 2){
+            if(i != 3){
                 lovelyTagsFinal.add(lovelyTag);
                 System.out.println(lovelyTag);
             }
@@ -155,18 +155,45 @@ public class RemoteMovieCatalogServer implements MovieCatalog{
                 topMoviesFromSimilarUsersFinal.add(s);
             }
         }
-
-//        for (String topMoviesFromSimilarUser : topMoviesFromSimilarUsers) {
-//            System.out.println(topMoviesFromSimilarUser);
+//        for(String s : topMoviesFromSimilarUsers){
+//            for(String ss : movieByUserWithHighMark){
+//                if(s.equals(ss)){
+//                    topMoviesFromSimilarUsersFinal.add(s);
+//                }
+//
+//            }
 //        }
-//        System.out.println();
+
+        for (String topMoviesFromSimilarUser : topMoviesFromSimilarUsersFinal) {
+            System.out.println(topMoviesFromSimilarUser);
+        }
+        System.out.println();
 
 //        List<String> moviesFromSimilarUserByLovelyTags = sql.getMoviesFromSimilarUserByLovelyTags(lovelyTags, topMoviesFromSimilarUsers);
 //        for (String moviesFromSimilarUserByLovelyTag : moviesFromSimilarUserByLovelyTags) {
 //            System.out.println(moviesFromSimilarUserByLovelyTag);
 //        }
+        List<String> moviesFromSimilarUserByLovelyTags = sql.getMoviesFromSimilarUserByLovelyTags(lovelyTagsFinal, topMoviesFromSimilarUsersFinal);
+        for (String moviesFromSimilarUserByLovelyTag : moviesFromSimilarUserByLovelyTags) {
+            System.out.println(moviesFromSimilarUserByLovelyTag);
+        }
 
-        return sql.getMoviesFromSimilarUserByLovelyTags(lovelyTagsFinal, topMoviesFromSimilarUsersFinal);
+        Map<String, Double> map = sql.getAverageMarkByMovieName(moviesFromSimilarUserByLovelyTags).entrySet().stream()
+                .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (a, b) -> a,
+                        LinkedHashMap::new
+                ));
+        for (String s : moviesFromSimilarUserByLovelyTags) {
+            if (!map.containsKey(s)) {
+                map.put(s, 0.0);
+            }
+        }
+
+//        return sql.getMoviesFromSimilarUserByLovelyTags(lovelyTagsFinal, topMoviesFromSimilarUsersFinal);
+        return map;
     }
 
     @Override
